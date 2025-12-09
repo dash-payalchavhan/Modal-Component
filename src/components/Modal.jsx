@@ -1,8 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 
-const Modal = ({
-  title,  children,  footer,  size,  showHeader,  showCloseButton,  showFooter,  enableEscapeKey,  closeOnOutsideClick,  isOpen,  onClose,  onConfirm,  buttonType,
+const Modal = ({  title,  children,  footer,  size,  showHeader,  showCloseButton,  showFooter,  enableEscapeKey,  closeOnOutsideClick,  isOpen,  onClose,  onConfirm,  buttonType,
 }) => {
   const modalRef = React.useRef(null);
   const previousFocusRef = React.useRef(null);
@@ -22,47 +21,9 @@ const Modal = ({
     }
   }, [isOpen, onClose, enableEscapeKey]);
 
-  // Focus handling
+  // Reset input when modal closes
   React.useEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement;
-      setTimeout(() => closeButtonRef.current?.focus(), 100);
-    } else {
-      previousFocusRef.current?.focus();
-    }
-  }, [isOpen]);
-
-  // Focus trap in modal
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const modal = modalRef.current;
-    if (!modal) return;
-
-    const focusableEl = modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    const first = focusableEl[0];
-    const last = focusableEl[focusableEl.length - 1];
-
-    const handleTab = (e) => {
-      if (e.key !== "Tab") return;
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    modal.addEventListener("keydown", handleTab);
-    return () => modal.removeEventListener("keydown", handleTab);
-  }, [isOpen]);
-
-  // Prevent body scroll
-  React.useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "unset";
-    return () => (document.body.style.overflow = "unset");
+    if (!isOpen) setInputValue("");
   }, [isOpen]);
 
   const handleBackdropClick = (e) => {
@@ -99,18 +60,10 @@ const Modal = ({
         onClick={(e) => e.stopPropagation()}
         style={{ position: "relative", zIndex: 1051 }}
       >
-        <div
-          ref={modalRef}
-          className="modal-content"
-          style={{ animation: "zoomIn .25s" }}
-        >
+        <div ref={modalRef} className="modal-content" style={{ animation: "zoomIn .25s" }}>
           {showHeader && (
             <div className="modal-header">
-              {title && (
-                <h5 id="modal-title" className="modal-title">
-                  {title}
-                </h5>
-              )}
+              {title && <h5 id="modal-title" className="modal-title">{title}</h5>}
               {showCloseButton && (
                 <button
                   ref={closeButtonRef}
@@ -122,10 +75,13 @@ const Modal = ({
               )}
             </div>
           )}
+
+          {/* Body with input auto binding */}
           <div className="modal-body">
             {React.Children.map(children, (child) => {
               if (React.isValidElement(child) && child.type === "input") {
                 return React.cloneElement(child, {
+                  value: inputValue,
                   onChange: (e) => setInputValue(e.target.value),
                 });
               }
@@ -133,6 +89,7 @@ const Modal = ({
             })}
           </div>
 
+          {/* FOOTER */}
           {showFooter && (
             <div className="modal-footer">
               {footer}
@@ -145,10 +102,11 @@ const Modal = ({
                   <button
                     onClick={() => {
                       if (inputValue.trim()) {
-                        onConfirm({ value: inputValue });
+                        onConfirm({ isValid: true, value: inputValue });
                       } else {
                         onConfirm({ isValid: false });
                       }
+                      setInputValue(""); // clear after confirm
                     }}
                     className="btn btn-primary"
                   >
@@ -156,19 +114,6 @@ const Modal = ({
                   </button>
                 </>
               )}
-
-              {buttonType === "cancel" && (
-                <button onClick={onClose} className="btn btn-secondary">
-                  Cancel
-                </button>
-              )}
-
-              {buttonType === "confirm" && (
-                <button onClick={onConfirm} className="btn btn-primary">
-                  Confirm
-                </button>
-              )}
-
             </div>
           )}
         </div>
