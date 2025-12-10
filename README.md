@@ -10,7 +10,7 @@
 -Focus trap inside modal
 -Restore focus to previous element when closed
 -Disable body scrolling when modal is open
--Dynamic sizes: sm, md, lg, xl
+-Dynamic sizes: sm, md, lg
 -Optional header & footer visibility
 -Custom footer actions (buttons or elements)
 -Fully controlled component (no internal state confusion)
@@ -41,7 +41,7 @@ src/
 
 ---
 
-## Installation
+## Integration
 
 Copy Modal.jsx into:
 
@@ -62,6 +62,17 @@ import Modal from "./components/Modal";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleConfirm = (result) => {
+    if (result.isValid) {
+      console.log("Valid Input:", result.value);
+    } else {
+      console.log("Invalid Input: Input is empty");
+    }
+    closeModal();
+  };
 
   const modalConfig = {
     title: "Basic Modal",
@@ -75,18 +86,12 @@ function App() {
 
   return (
     <>
-      <button onClick={() => setIsModalOpen(true)}>Open Modal</button>
-
+      <button onClick={openModal}>Open Modal</button>
       <Modal
         {...modalConfig}
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        footer={
-          <>
-            <button onClick={() => setIsModalOpen(false)}>Cancel</button>
-            <button onClick={() => alert("Action confirmed")}>Confirm</button>
-          </>
-        }
+        onClose={closeModal}
+        onConfirm={handleConfirm}
       >
         <p>This is the modal body with dynamic content.</p>
       </Modal>
@@ -103,20 +108,19 @@ export default App;
 
 ###    `Reference`
 
-|Prop	             |Type	        |Required	            |Description
+|Prop	               |Type	              |Required	            |Description
 _______________________________________________________________________________________
-isOpen	             |boolean	    |Yes	                |Controls modal visibility
-onClose	             |function	    |Yes                	|Callback to close the modal
-title	             |string     	|No                 	|Modal header title
-size	             |"sm" | "md"   |No	                    |Modal width
-                     |"lg" | "xl"	 
-showHeader	         |boolean    	|No                 	|Toggle header
-showCloseButton	     |boolean  	    |No                 	|Toggle (X) button
-showFooter	         |boolean	    |No                 	|Toggle footer
-enableEscapeKey	     |boolean	    |No                 	|Close via Escape key
-closeOnOutsideClick	 |boolean	    |No	                    |Close by clicking outside
-footer	             |ReactNode 	|No                 	|Custom footer actions
-children	         |ReactNode	    |Yes                	|Body content inside modal
+isOpen	             |boolean	            |Yes	                |Controls modal visibility
+onClose	             |function	          |Yes                	|Callback to close the modal
+title	               |string         	    |No                 	|Modal header title
+size	               |"sm" |"md" |"lg"    |No	                  |Modal width 	 
+showHeader	         |boolean    	        |No                 	|Toggle header
+showCloseButton	     |boolean  	          |No                 	|Toggle (X) button
+showFooter	         |boolean	            |No                 	|Toggle footer
+enableEscapeKey	     |boolean	            |No                 	|Close via Escape key
+closeOnOutsideClick	 |boolean	            |No	                  |Close by clicking outside
+footer	             |ReactNode 	        |No                 	|Custom footer actions
+children	           |ReactNode	          |Yes                  |Body content inside modal
 
 
 ### Size Variants
@@ -124,7 +128,7 @@ Size |	Width
 sm   | 	~30%
 md	 |  ~50%
 lg	 |  ~70%
-xl	 |  ~90%
+
 
 ---
 

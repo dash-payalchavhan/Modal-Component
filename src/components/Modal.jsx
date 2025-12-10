@@ -1,7 +1,20 @@
 import React from "react";
 import { X } from "lucide-react";
 
-const Modal = ({  title,  children,  footer,  size,  showHeader,  showCloseButton,  showFooter,  enableEscapeKey,  closeOnOutsideClick,  isOpen,  onClose,  onConfirm,  buttonType,
+const Modal = ({
+  title,
+  children,
+  footer,
+  size,
+  showHeader,
+  showCloseButton,
+  showFooter,
+  enableEscapeKey,
+  closeOnOutsideClick,
+  isOpen,
+  onClose,
+  onConfirm,
+  buttonType,
 }) => {
   const modalRef = React.useRef(null);
   const previousFocusRef = React.useRef(null);
@@ -60,10 +73,18 @@ const Modal = ({  title,  children,  footer,  size,  showHeader,  showCloseButto
         onClick={(e) => e.stopPropagation()}
         style={{ position: "relative", zIndex: 1051 }}
       >
-        <div ref={modalRef} className="modal-content" style={{ animation: "zoomIn .25s" }}>
+        <div
+          ref={modalRef}
+          className="modal-content"
+          style={{ animation: "zoomIn .25s" }}
+        >
           {showHeader && (
             <div className="modal-header">
-              {title && <h5 id="modal-title" className="modal-title">{title}</h5>}
+              {title && (
+                <h5 id="modal-title" className="modal-title">
+                  {title}
+                </h5>
+              )}
               {showCloseButton && (
                 <button
                   ref={closeButtonRef}
@@ -89,16 +110,44 @@ const Modal = ({  title,  children,  footer,  size,  showHeader,  showCloseButto
             })}
           </div>
 
+         
           {/* FOOTER */}
           {showFooter && (
-            <div className="modal-footer">
-              {footer}
+            <div className="modal-footer d-flex justify-content-between w-100">
+              {/* CANCEL ONLY */}
+              {buttonType === "cancel" && (
+                <button
+                  onClick={onClose}
+                  className="btn btn-secondary ms-auto d-block"
+                >
+                  Cancel
+                </button>
+              )}
 
+              {/* CONFIRM ONLY */}
+              {buttonType === "confirm" && (
+                <button
+                  onClick={() => {
+                    if (inputValue.trim()) {
+                      onConfirm({ isValid: true, value: inputValue });
+                    } else {
+                      onConfirm({ isValid: false });
+                    }
+                    setInputValue("");
+                  }}
+                  className="btn btn-primary ms-auto d-block"
+                >
+                  Confirm
+                </button>
+              )}
+
+              {/* BOTH BUTTONS */}
               {buttonType === "both" && (
-                <>
+                <div className="d-flex justify-content-between w-100">
                   <button onClick={onClose} className="btn btn-secondary">
                     Cancel
                   </button>
+
                   <button
                     onClick={() => {
                       if (inputValue.trim()) {
@@ -106,14 +155,17 @@ const Modal = ({  title,  children,  footer,  size,  showHeader,  showCloseButto
                       } else {
                         onConfirm({ isValid: false });
                       }
-                      setInputValue(""); // clear after confirm
+                      setInputValue("");
                     }}
                     className="btn btn-primary"
                   >
                     Confirm
                   </button>
-                </>
+                </div>
               )}
+
+              {/* NONE → show nothing */}
+              {buttonType === "none" && null}
             </div>
           )}
         </div>
