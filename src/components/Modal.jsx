@@ -4,7 +4,6 @@ import { X } from "lucide-react";
 const Modal = ({
   title,
   children,
-  footer,
   size,
   showHeader,
   showCloseButton,
